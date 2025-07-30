@@ -13,8 +13,12 @@ spec:
     metadata:
       labels:
         app: frontend
+
+
     spec:
       containers:
+      imagePullSecrets:
+      - name: regcred
 
       - name: frontend
         image: wxpua/practice:frontend

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: test-app
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Wei-Xin27/test.git
+    targetRevision: main
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc  # In-cluster Kubernetes API
+    namespace: default  # Change to your desired target namespace
+  syncPolicy:
+    automated:
+      prune: true         # ✅ Enables pruning
+      selfHeal: true      # ✅ Optional: auto-correct drift without manual sync
+    syncOptions:
+      - CreateNamespace=true
