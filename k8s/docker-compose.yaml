@@ -1,0 +1,16 @@
+services:
+  frontend:
+    build:
+      context: frontend
+    ports:
+      - 3001:3001
+    depends_on:
+     - server
+
+  server:
+    container_name: server
+    restart: always
+    build:
+      context: backend
+    ports:
+      - 3000:3000

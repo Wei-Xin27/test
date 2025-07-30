@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: name-cm
+data:
+  GREETING_TEXT: Hi, I am Misa
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-url
+data:
+  BACKEND_URL: http://backend-service
