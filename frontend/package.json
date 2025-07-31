@@ -8,7 +8,7 @@
   "main": "frontend.js",
   "devDependencies": {},
   "scripts": {
-        "start": "node backend.js"
+        "start": "node frontend.js"
   },
   "author": "",
   "license": "ISC",
