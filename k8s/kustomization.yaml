@@ -8,3 +8,4 @@ resources:
   - secret.yaml
   - ClusterRole.yaml
   - pv.yaml
+  - albIngressClass.yaml.yaml
