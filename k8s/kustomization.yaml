@@ -8,4 +8,3 @@ resources:
   - secret.yaml
   - ClusterRole.yaml
   - pv.yaml
-  - dockerRepoSecrets.yaml

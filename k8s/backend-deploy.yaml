@@ -15,9 +15,6 @@ spec:
         app: backend
     spec:
       containers:
-      imagePullSecrets:
-      - name: regcred
-
       - name: backend
         image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:backend-latest
         ports:

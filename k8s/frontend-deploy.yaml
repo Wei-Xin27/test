@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend-deployment
+  namespace: default
   labels:
     app: frontend
 spec:
@@ -13,27 +14,24 @@ spec:
     metadata:
       labels:
         app: frontend
-
-
     spec:
-      containers:
       imagePullSecrets:
-      - name: regcred
-
-      - name: frontend
-        image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:frontend-latest
-        ports:
-        - containerPort: 3001
-        envFrom:
-          - configMapRef:
-              name: name-cm
-          - configMapRef:
-              name: backend-url
-        readinessProbe:
-          tcpSocket:
-            port: 3001
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: regcred
+      containers:
+        - name: frontend
+          image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:frontend-latest
+          ports:
+            - containerPort: 3001
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: 3001
+          envFrom:
+            - configMapRef:
+                name: name-cm
+            - configMapRef:
+                name: backend-url
 
 ---
 apiVersion: v1
