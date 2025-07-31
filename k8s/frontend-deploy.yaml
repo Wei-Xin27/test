@@ -21,7 +21,7 @@ spec:
       - name: regcred
 
       - name: frontend
-        image: wxpua/practice:frontend
+        image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:frontend-latest
         ports:
         - containerPort: 3001
         envFrom:
