@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: name-cm
 data:
-  GREETING_TEXT: Hi, I am Misa
+  GREETING_TEXT: Hi, I am Misa,from config map
 ---
 apiVersion: v1
 kind: ConfigMap
