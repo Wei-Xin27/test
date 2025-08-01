@@ -14,6 +14,7 @@ app.get('/', async (req, res) => {
         <h1>${GREETING_TEXT}</h1>
         <p>Backend says: ${response.data.message}</p>
         <p>Secret is: ${response.data.secret}</p>
+        <p>Secret is: ${response.data.secret}</p>
       `);
     })
 
