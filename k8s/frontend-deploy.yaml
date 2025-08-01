@@ -15,7 +15,6 @@ spec:
       labels:
         app: frontend
     spec:
-      serviceAccountName: elb-access-sa
 
       containers:
         - name: frontend
