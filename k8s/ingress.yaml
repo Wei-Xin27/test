@@ -7,6 +7,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-southeast-1:827812789584:certificate/684a3b58-0bf6-4f0e-a631-024af1c3cf8b
 spec:
   ingressClassName: alb
   rules:
@@ -20,7 +21,8 @@ spec:
     #             name: my-app-service
     #             port:
     #               number: 8080
-  - http:
+  - host: misa.client88.me
+    http:
       paths:
       - path: /
         pathType: Prefix
