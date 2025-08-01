@@ -18,7 +18,7 @@ spec:
 
       containers:
         - name: frontend
-          image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:frontend-latest-frontend-test
+          image: 533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test:frontend-latest-12345
           imagePullPolicy: Always
 
           ports:
