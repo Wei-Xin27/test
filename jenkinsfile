@@ -1,62 +1,61 @@
-
-
 pipeline {
     agent any
 
-    stage('codebuild') {
-        when { expression { Refresh_pipeline == "" } }
-        steps {
-            script {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'cpms-qat-master',
-                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                        
-                        sh """
-
-                            aws codebuild start-build \
-                                --project-name FPMS-QAT-AMD-UPDATE \
-                                --environment-variables-override \
-                                    '[{"name": "branch", "value": "'${Branch}'", "type": "PLAINTEXT"},
-                                        {"name": "tag", "value": "'\${current_date_time}'", "type": "PLAINTEXT"},
-                                        {"name": "serviceNames", "value": "'${serviceNamesStrPass}'", "type": "PLAINTEXT"},
-                                        {"name": "namespace", "value": "'${Namespace}'", "type": "PLAINTEXT"},
-                                        {"name": "gituser", "value": "'codebuild'", "type": "PLAINTEXT"}]'
-                            
-                            id=\$(aws codebuild list-builds-for-project \
-                                --project-name FPMS-QAT-AMD-UPDATE \
-                                --sort-order DESCENDING \
-                                --max-items 1 \
-                                --output text | grep IDS | awk '{print \$2}')
+    parameters {
+        choice(
+            name: 'IMAGE_TAG',
+            choices: ['frontend-latest', 'backend-latest'],
+            description: 'Choose image tag'
+        )
+    }
 
 
-                            while true; do
-                                status=\$(aws codebuild batch-get-builds --ids \${id} | jq -r '.builds[].buildStatus')
-                                if [ "\${status}" != "IN_PROGRESS" ]; then
-                                    break
-                                fi
-                                sleep 10
-                            done
+    environment {
+        AWS_REGION = 'ap-southeast-1'
+        ECR_REPO_URI = '533267142189.dkr.ecr.ap-southeast-1.amazonaws.com/misa-test'
+    }
 
-                            echo "CodeBuild run finished"
-                            
-                            if [ "\${status}" != "SUCCEEDED" ]; then
-                                error "CodeBuild run failed"
-                            fi
-                            
-                            cloudwatch_groupName=\$(aws codebuild batch-get-builds --ids \${id} --output json | jq -r '.builds[].logs.groupName')
-                            cloudwatch_streamName=\$(aws codebuild batch-get-builds --ids \${id} --output json | jq -r '.builds[].logs.streamName')
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from GitHub
+                git branch: 'main', url: 'https://github.com/Wei-Xin27/test.git'
+            }
+        }
 
-                            aws logs get-log-events --log-group-name \${cloudwatch_groupName} --log-stream-name \${cloudwatch_streamName} > logs.json
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    docker.build("${ECR_REPO_URI}:${IMAGE_TAG}")
+                }
+            }
+        }
 
-                            sed -i 's/\\\\n//g' logs.json
-                            jq -r ".events[].message" logs.json
-                            rm -f logs.json
-                        """
-                    }                
+        stage('Login to AWS ECR') {
+            steps {
+                script {
+                    // Login to AWS ECR using AWS CLI and docker login
+                    sh """
+                    aws --region ${AWS_REGION} ecr get-login-password | docker login --username AWS --password-stdin ${ECR_REPO_URI.split('/')[0]}
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    // Push the image to ECR
+                    sh "docker push ${ECR_REPO_URI}:${IMAGE_TAG}"
+                }
             }
         }
     }
-    
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
 }
