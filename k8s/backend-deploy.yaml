@@ -14,8 +14,7 @@ spec:
       labels:
         app: backend
     spec:
-      # imagePullSecrets:
-      # - name: ecr-secret
+      serviceAccountName: elb-access-sa
       containers:
       
       - name: backend

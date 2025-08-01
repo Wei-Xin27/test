@@ -1,0 +1,62 @@
+
+
+pipeline {
+    agent any
+
+    stage('codebuild') {
+        when { expression { Refresh_pipeline == "" } }
+        steps {
+            script {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'cpms-qat-master',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                        
+                        sh """
+
+                            aws codebuild start-build \
+                                --project-name FPMS-QAT-AMD-UPDATE \
+                                --environment-variables-override \
+                                    '[{"name": "branch", "value": "'${Branch}'", "type": "PLAINTEXT"},
+                                        {"name": "tag", "value": "'\${current_date_time}'", "type": "PLAINTEXT"},
+                                        {"name": "serviceNames", "value": "'${serviceNamesStrPass}'", "type": "PLAINTEXT"},
+                                        {"name": "namespace", "value": "'${Namespace}'", "type": "PLAINTEXT"},
+                                        {"name": "gituser", "value": "'codebuild'", "type": "PLAINTEXT"}]'
+                            
+                            id=\$(aws codebuild list-builds-for-project \
+                                --project-name FPMS-QAT-AMD-UPDATE \
+                                --sort-order DESCENDING \
+                                --max-items 1 \
+                                --output text | grep IDS | awk '{print \$2}')
+
+
+                            while true; do
+                                status=\$(aws codebuild batch-get-builds --ids \${id} | jq -r '.builds[].buildStatus')
+                                if [ "\${status}" != "IN_PROGRESS" ]; then
+                                    break
+                                fi
+                                sleep 10
+                            done
+
+                            echo "CodeBuild run finished"
+                            
+                            if [ "\${status}" != "SUCCEEDED" ]; then
+                                error "CodeBuild run failed"
+                            fi
+                            
+                            cloudwatch_groupName=\$(aws codebuild batch-get-builds --ids \${id} --output json | jq -r '.builds[].logs.groupName')
+                            cloudwatch_streamName=\$(aws codebuild batch-get-builds --ids \${id} --output json | jq -r '.builds[].logs.streamName')
+
+                            aws logs get-log-events --log-group-name \${cloudwatch_groupName} --log-stream-name \${cloudwatch_streamName} > logs.json
+
+                            sed -i 's/\\\\n//g' logs.json
+                            jq -r ".events[].message" logs.json
+                            rm -f logs.json
+                        """
+                    }                
+            }
+        }
+    }
+    
+}
