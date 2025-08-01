@@ -101,14 +101,35 @@ pipeline {
 
         stage('Commit & Push Changes') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'misaGitHub', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                sh '''
-                    git config user.name "Jenkins"
-                    git config user.email "jenkins@example.com"
-                    git add ./k8s/frontend-deploy.yaml
-                    git commit -m "Update frontend image tag to $IMAGE_TAG"
-                    git push https://$GIT_USER:$GIT_PASS@github.com/Wei-Xin27/test.git HEAD:main
-                '''
+                
+                script {
+                    
+
+                    if (params.IMAGE_TAG == 'frontend-latest') {
+                        withCredentials([usernamePassword(credentialsId: 'misaGitHub', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh '''
+                            git config user.name "Jenkins"
+                            git config user.email "jenkins@example.com"
+                            git add ./k8s/frontend-deploy.yaml
+                            git commit -m "Update frontend image tag to $IMAGE_TAG"
+                            git push https://$GIT_USER:$GIT_PASS@github.com/Wei-Xin27/test.git HEAD:main
+                        '''
+                        }
+                    } else if (params.IMAGE_TAG == 'backend-latest') {
+                        withCredentials([usernamePassword(credentialsId: 'misaGitHub', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh '''
+                            git config user.name "Jenkins"
+                            git config user.email "jenkins@example.com"
+                            git add ./k8s/backend-deploy.yaml
+                            git commit -m "Update backend image tag to $IMAGE_TAG"
+                            git push https://$GIT_USER:$GIT_PASS@github.com/Wei-Xin27/test.git HEAD:main
+                        '''
+                        }
+                    } else {
+                        error "Unsupported IMAGE_TAG value: ${params.IMAGE_TAG}"
+                    }
+
+                  
                 }
             }
         }
