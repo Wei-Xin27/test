@@ -19,12 +19,14 @@ app.use(cors({
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
+
+
     }
   }
 }));
 
 app.get('/api/data', (req, res) => {
-  res.json({ message: 'Hello! from backend!', secret: SECRET_PASSWORD });
+  res.json({ message: 'Hello, from backend!', secret: SECRET_PASSWORD });
 });
 
 app.listen(PORT, () => {
