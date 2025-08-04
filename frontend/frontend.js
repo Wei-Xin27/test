@@ -14,6 +14,7 @@ app.get('/', async (req, res) => {
         <h1>${GREETING_TEXT}</h1>
         <p>Backend says: ${response.data.message}</p>
         <p>Secret is: ${response.data.secret}</p>
+        <p>Secret is: ${response.data.secret}</p>
       `);
     })
 
@@ -22,6 +23,9 @@ app.get('/', async (req, res) => {
     res.status(500).send('Error connecting to backend.');
   }
 
+});
+app.get('/healthz', (req, res) => {
+  res.send('OK');
 });
 
 // Delay app startup for 10 seconds
