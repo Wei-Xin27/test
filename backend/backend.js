@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 app.get('/api/data', (req, res) => {
-  res.json({ message: 'Hello from backend!', secret: SECRET_PASSWORD });
+  res.json({ message: 'Hello! from backend!', secret: SECRET_PASSWORD });
 });
 
 app.listen(PORT, () => {
