@@ -16,6 +16,9 @@ app.get('/', async (req, res) => {
         <p>Secret is: ${response.data.secret}</p>
         <p>Secret is: ${response.data.secret}</p>
         <p>Secret is: ${response.data.secret}</p>
+        <p>Secret is: ${response.data.secret}</p>
+        <p>Secret is: ${response.data.secret}</p>
+        <p>Secret is: ${response.data.secret}</p>
       `);
     })
 
